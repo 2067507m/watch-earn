@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.db
+.env
+*.log
+app_backup*
+watch_earn_backup*
+check_*.js
+app_before_video.py
+check.js
+frontend/index_backup*

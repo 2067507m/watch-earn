@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch & Earn</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.container {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: 0;
+    border-radius: 10px;
+    background: #111;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+.secondary {
+    background: #e9ecef;
+    color: #222;
+}
+
+.hidden {
+    display: none;
+}
+
+.balance {
+    text-align: center;
+    padding: 25px;
+    border-radius: 16px;
+    background: #111;
+    color: white;
+}
+
+.balance-value {
+    font-size: 38px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.task {
+    border: 1px solid #eee;
+    border-radius: 14px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+.task-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.task-description {
+    color: #777;
+    margin: 7px 0;
+}
+
+.reward {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.message {
+    text-align: center;
+    margin-top: 12px;
+    font-weight: bold;
+
+.logout {
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- LOGIN -->
+    <div id="loginScreen" class="card">
+
+        <h1>💰 Watch & Earn</h1>
+
+        <div class="subtitle">
+            Login to your account
+        </div>
+
+        <input
+            id="loginUsername"
+            type="text"
+            placeholder="Username"
+        >
+
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="Password"
+        >
+
+        <button onclick="login()">
+            Login
+        </button>
+
+        <button class="secondary" onclick="showRegister()">
+            Create Account
+        </button>
+
+        <div id="loginMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- REGISTER -->
+    <div id="registerScreen" class="card hidden">
+
+        <h1>📝 Create Account</h1>
+
+        <div class="subtitle">
+            Join Watch & Earn
+        </div>
+
+        <input
+            id="registerUsername"
+            type="text"
+            placeholder="Username"
+        >
+
+        <input
+            id="registerPassword"
+            type="password"
+            placeholder="Password"
+        >
+
+        <button onclick="register()">
+            Register
+        </button>
+
+        <button class="secondary" onclick="showLogin()">
+            Back to Login
+        </button>
+
+        <div id="registerMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- HOME -->
+    <div id="homeScreen" class="hidden">
+
+        <div class="card">
+
+            <h1>👋 Welcome</h1>
+
+            <div id="usernameText"
+                 class="subtitle">
+            </div>
+
+            <div class="balance">
+
+                <div>
+                    CURRENT BALANCE
+                </div>
+
+                <div id="balance"
+                     class="balance-value">
+                    0
+                </div>
+
+                <div>
+                    POINTS
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>🎬 Available Tasks</h2>
+
+            <div id="tasks">
+                Loading tasks...
+            </div>
+
+        </div>
+
+
+<!-- WITHDRAW -->
+<div class="card">
+
+    <h2>💸 Withdraw</h2>
+
+    <div class="subtitle">
+        Minimum withdrawal: 10 points
+    </div>
+
+    <input
+        id="withdrawAmount"
+        type="number"
+        min="10"
+        placeholder="Amount in points"
+    >
+
+    <select id="withdrawAccountType">
+        <option value="">Select payment method</option>
+        <option value="Easypaisa">Easypaisa</option>
+        <option value="JazzCash">JazzCash</option>
+        <option value="USDT (TRC20)">USDT (TRC20)</option>
+    </select>
+
+    <input
+        id="withdrawAccountNumber"
+        type="text"
+        placeholder="Account number / mobile number"
+    >
+
+    <button onclick="submitWithdraw()">
+        💸 Request Withdrawal
+    </button>
+
+    <div id="withdrawMessage" class="message"></div>
+
+</div>
+
+
+<!-- USER DEPOSIT / PACKAGES -->
+<div class="card" id="depositPanel">
+    <h2>💳 Buy Points</h2>
+
+    <div id="depositPackages">
+        ⏳ Loading packages...
+    </div>
+
+    <div id="depositMessage" class="message"></div>
+</div>
+
+<!-- ADMIN TASK MANAGEMENT -->
+<div class="card" id="adminTaskPanel" style="display:none;">
+    <h2>🛠️ Task Management</h2>
+
+    <input id="adminTaskTitle" type="text" placeholder="Task title">
+
+    <input id="adminTaskDescription" type="text" placeholder="Task description">
+
+    <input id="adminTaskReward" type="number" min="1" placeholder="Reward points">
+
+    <button onclick="adminAddTask()">➕ Add Task</button>
+
+    <div id="adminTaskMessage" class="message"></div>
+<div id="adminEditTaskBox" style="display:none; margin-top:15px;">
+    <h3>✏️ Edit Task</h3>
+
+    <input id="editTaskId" type="hidden">
+
+    <input id="editTaskTitle" type="text" placeholder="Task title">
+
+    <input id="editTaskDescription" type="text" placeholder="Task description">
+
+    <input id="editTaskReward" type="number" min="1" placeholder="Reward points">
+
+    <button onclick="saveEditedTask()">💾 Save Changes</button>
+    <button onclick="cancelEditTask()">❌ Cancel</button>
+</div>
+
+
+    <div id="adminTaskList">
+        ⏳ Loading tasks...
+    </div>
+</div>
+
+<!-- ADMIN USER MANAGEMENT -->
+<div class="card" id="adminUserPanel" style="display:none;">
+    <h2>👥 User Management</h2>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;">
+        <input
+            id="adminUserSearch"
+            type="text"
+            placeholder="Search username or User ID"
+            style="flex:1; min-width:200px;"
+        >
+
+        <button onclick="searchAdminUsers()">🔎 Search</button>
+        <button onclick="loadAdminUsers()">🔄 Refresh</button>
+    </div>
+
+    <div id="adminUserMessage" class="message"></div>
+
+    <div id="adminUserList">
+        ⏳ Loading users...
+    </div>
+</div>
+
+<!-- ADMIN POINT HISTORY -->
+<div class="card" id="adminPointHistoryPanel" style="display:none;">
+    <h2>📜 Point History</h2>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;">
+        <input
+            id="adminPointHistorySearch"
+            type="text"
+            placeholder="Search username or User ID"
+            style="flex:1; min-width:200px;"
+        >
+
+        <button onclick="searchPointHistory()">🔎 Search</button>
+        <button onclick="loadPointHistory()">🔄 Refresh</button>
+    </div>
+
+    <div id="adminPointHistoryMessage" class="message"></div>
+
+    <div id="adminPointHistoryList">
+        ⏳ Loading point history...
+    </div>
+</div>
+
+<!-- ADMIN WITHDRAWAL PANEL -->
+
+<div class="card" id="adminDepositPanel" style="display:none;">
+    <h2>💳 Admin Deposit Panel</h2>
+
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0;">
+        <button onclick="setAdminDepositFilter('all')">📋 All</button>
+        <button onclick="setAdminDepositFilter('pending')">🕐 Pending</button>
+        <button onclick="setAdminDepositFilter('approved')">✅ Approved</button>
+        <button onclick="setAdminDepositFilter('rejected')">❌ Rejected</button>
+        <button onclick="loadAdminDeposits()">🔄 Refresh</button>
+    </div>
+
+    <div id="adminDepositSummary" class="subtitle"></div>
+    <div id="adminDeposits">
+        ⏳ Loading deposits...
+    </div>
+</div>
+
+<div class="card" id="adminPanel" style="display:none;">
+    <h2>🛠️ Admin Withdrawal Panel</h2>
+
+    <div id="adminFilters" style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0;">
+        <button onclick="setAdminFilter("all")">📋 All</button>
+        <button onclick="setAdminFilter("pending")">🕐 Pending</button>
+        <button onclick="setAdminFilter("approved")">✅ Approved</button>
+        <button onclick="setAdminFilter("rejected")">❌ Rejected</button>
+    </div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;">
+        <button onclick="loadAdminWithdrawals()">🔄 Refresh</button>
+    </div>
+
+    <div id="adminStats" class="subtitle"></div>
+    <div id="adminSummary" class="subtitle"></div>
+    <div id="adminWithdrawals">⏳ Loading requests...</div>
+</div>
+
+<!-- TRANSACTION HISTORY -->
+<div class="card">
+
+    <h2>📜 Transaction History</h2>
+
+    <div id="transactionHistory">
+        ⏳ Loading transaction history...
+    </div>
+
+</div>
+
+<!-- WITHDRAWAL HISTORY -->
+<div class="card">
+
+    <h2>📋 Withdrawal History</h2>
+
+    <div id="withdrawHistory">
+        ⏳ Loading withdrawal history...
+    </div>
+
+</div>
+
+<button
+    class="secondary logout"
+    onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API = "";
+
+let TOKEN = localStorage.getItem("watchEarnToken");
+
+async function submitWithdraw() {
+    const amount = Number(document.getElementById("withdrawAmount").value);
+    const accountType = document.getElementById("withdrawAccountType").value;
+    const accountNumber = document.getElementById("withdrawAccountNumber").value.trim();
+    const message = document.getElementById("withdrawMessage");
+
+    if (!amount || amount < 10) {
+        message.innerText = "❌ Minimum withdrawal is 10 points";
+        return;
+    }
+
+    if (!accountType || !accountNumber) {
+        message.innerText = "❌ Please enter all account details";
+        return;
+    }
+
+    message.innerText = "⏳ Submitting withdrawal...";
+
+    try {
+        const response = await fetch(API + "/withdraw", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({amount: amount, account_type: accountType, account_number: accountNumber})
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            message.innerText = "❌ " + data.error;
+            return;
+        }
+
+        message.innerText = "✅ Withdrawal request submitted!";
+
+        if (data.remaining_points !== undefined) document.getElementById("balance").innerText = data.remaining_points;
+        document.getElementById("withdrawAmount").value = "";
+        document.getElementById("withdrawAccountNumber").value = "";
+
+    } catch (error) {
+        message.innerText = "❌ Server connection error";
+    }
+}
+
+
+// =========================
+// SCREEN CONTROL
+// =========================
+
+function showLogin() {
+
+    document
+        .getElementById("loginScreen")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("registerScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("homeScreen")
+        .classList.add("hidden");
+}
+
+
+function showRegister() {
+
+    document
+        .getElementById("loginScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("registerScreen")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("homeScreen")
+        .classList.add("hidden");
+}
+
+
+function showHome() {
+
+    document
+        .getElementById("loginScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("registerScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("homeScreen")
+        .classList.remove("hidden");
+}
+
+
+// =========================
+// REGISTER
+// =========================
+
+async function register() {
+
+    const username =
+        document.getElementById(
+            "registerUsername"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "registerPassword"
+        ).value;
+
+    const message =
+        document.getElementById(
+            "registerMessage"
+        );
+
+    message.innerText = "Creating account...";
+
+    try {
+
+        const response = await fetch(
+            API + "/register",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+
+            message.innerText =
+                "❌ " + data.error;
+
+            return;
+        }
+
+        message.innerText =
+            "✅ Account created!";
+
+        setTimeout(() => {
+            showLogin();
+        }, 1000);
+
+    } catch (error) {
+
+        message.innerText =
+            "❌ Server connection error";
+    }
+}
+
+
+// =========================
+// LOGIN
+// =========================
+
+async function login() {
+
+    const username =
+        document.getElementById(
+            "loginUsername"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "loginPassword"
+        ).value;
+
+    const message =
+        document.getElementById(
+            "loginMessage"
+        );
+
+    message.innerText = "Logging in...";
+
+    try {
+
+        const response = await fetch(
+            API + "/login",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+
+            message.innerText =
+                "❌ " + data.error;
+
+            return;
+        }
+
+        TOKEN = data.token;
+
+        localStorage.setItem(
+            "watchEarnToken",
+            TOKEN
+        );
+
+        showHome();
+
+        loadProfile();
+        loadTasks();
+        loadWithdrawals();
+        loadTransactions();
+
+    } catch (error) {
+
+        message.innerText =
+            "❌ Server connection error";
+    }
+}
+
+
+// =========================
+// PROFILE
+// =========================
+
+async function loadProfile() {
+
+    try {
+
+        const response = await fetch(
+            API + "/me",
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+
+            logout();
+            return;
+        }
+
+        document.getElementById(
+            "usernameText"
+        ).innerText =
+            "Username: " +
+            data.user.username;
+
+        document.getElementById(
+            "balance"
+        ).innerText =
+            data.user.points;
+
+        loadPackages();
+
+        if (data.user.is_admin) {
+            loadAdminWithdrawals();
+            loadAdminTasks();
+            loadAdminUsers();
+            loadAdminDeposits();
+            loadPointHistory();
+        }
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
+
+
+
+// =========================
+// WITHDRAWAL HISTORY
+// =========================
+
+let ADMIN_WITHDRAWAL_FILTER = "all";
+let ADMIN_WITHDRAWAL_DATA = [];
+
+async function loadAdminStats() {
+    const stats = document.getElementById("adminStats");
+    if (!stats) return;
+
+    try {
+        const response = await fetch(API + "/admin/stats", {
+            headers: {"Authorization": "Bearer " + TOKEN}
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            stats.innerText = "❌ " + data.error;
+            return;
+        }
+
+        stats.innerText =
+            "👥 Users: " + data.total_users +
+            " | 🕐 Pending: " + data.pending_amount + " points" +
+            " | ✅ Approved: " + data.approved_amount + " points" +
+            " | ❌ Rejected: " + data.rejected_amount + " points";
+
+    } catch (error) {
+        stats.innerText = "❌ Could not load admin stats";
+    }
+}
+
+function setAdminFilter(filter) {
+    ADMIN_WITHDRAWAL_FILTER = filter;
+    renderAdminWithdrawals();
+}
+
+function renderAdminWithdrawals() {
+    const container = document.getElementById("adminWithdrawals");
+    const summary = document.getElementById("adminSummary");
+
+    if (!container) return;
+
+    const all = ADMIN_WITHDRAWAL_DATA;
+    const filtered = ADMIN_WITHDRAWAL_FILTER === "all"
+        ? all
+        : all.filter(item => item.status === ADMIN_WITHDRAWAL_FILTER);
+
+    const pending = all.filter(item => item.status === "pending");
+    const approved = all.filter(item => item.status === "approved");
+    const rejected = all.filter(item => item.status === "rejected");
+
+    const pendingAmount = pending.reduce(
+        (total, item) => total + Number(item.amount || 0),
+        0
+    );
+
+    const approvedAmount = approved.reduce(
+        (total, item) => total + Number(item.amount || 0),
+        0
+    );
+
+    const stats = document.getElementById("adminStats");
+
+    if (stats) {
+        stats.innerText =
+            "💰 Pending Amount: " + pendingAmount + " points" +
+            " | ✅ Approved Amount: " + approvedAmount + " points";
+    }
+
+    if (summary) {
+        summary.innerText =
+            "📊 Total: " + all.length +
+            " | 🕐 Pending: " + pending.length +
+            " (" + pendingAmount + " points)" +
+            " | ✅ Approved: " + approved.length +
+            " | ❌ Rejected: " + rejected.length;
+    }
+
+    if (!filtered.length) {
+        container.innerHTML = "No " + ADMIN_WITHDRAWAL_FILTER + " withdrawal requests.";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    filtered.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "task";
+
+        let actions = "";
+
+        if (item.status === "pending") {
+            actions = `
+                <button onclick="approveWithdrawal(${item.id})">
+                    ✅ Approve
+                </button>
+                <button onclick="rejectWithdrawal(${item.id})">
+                    ❌ Reject
+                </button>
+            `;
+        }
+
+        div.innerHTML = `
+            <div class="task-title">💰 ${item.amount} points — #${item.id}</div>
+            <div class="task-description">👤 User: ${item.username}</div>
+            <div class="task-description">💳 ${item.account_type}</div>
+            <div class="task-description">📱 ${item.account_number}</div>
+            <div class="reward">🕐 Status: ${item.status}</div>
+            <div class="task-description">📅 ${item.created_at}</div>
+            ${item.admin_note ? `<div class="task-description">📝 Note: ${item.admin_note}</div>` : ""}
+            ${actions}
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+let adminDepositFilter = "all";
+let adminDepositsCache = [];
+
+function setAdminDepositFilter(filter) {
+    adminDepositFilter = filter;
+    renderAdminDeposits();
+}
+
+async function loadAdminDeposits() {
+    const panel = document.getElementById("adminDepositPanel");
+    const box = document.getElementById("adminDeposits");
+
+    if (!panel || !box) return;
+
+    panel.style.display = "block";
+    const summary = document.getElementById("adminDepositSummary");
+
+    if (!box) return;
+
+    box.innerHTML = "⏳ Loading deposits...";
+
+    try {
+        const res = await fetch(API + "/admin/deposits", {
+            headers: {
+                "Authorization": "Bearer " + TOKEN
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+            box.innerHTML = "❌ Failed to load deposits";
+            return;
+        }
+
+        adminDepositsCache = data.deposits || [];
+        renderAdminDeposits();
+
+    } catch (e) {
+        console.error(e);
+        box.innerHTML = "❌ Network error";
+    }
+}
+
+function renderAdminDeposits() {
+    const box = document.getElementById("adminDeposits");
+    const summary = document.getElementById("adminDepositSummary");
+
+    if (!box) return;
+
+    let deposits = adminDepositsCache;
+
+    if (adminDepositFilter !== "all") {
+        deposits = deposits.filter(
+            d => d.status === adminDepositFilter
+        );
+    }
+
+    const pending = adminDepositsCache.filter(d => d.status === "pending").length;
+    const approved = adminDepositsCache.filter(d => d.status === "approved").length;
+    const rejected = adminDepositsCache.filter(d => d.status === "rejected").length;
+
+    if (summary) {
+        summary.innerHTML =
+            `Total: ${adminDepositsCache.length} | ` +
+            `🕐 Pending: ${pending} | ` +
+            `✅ Approved: ${approved} | ` +
+            `❌ Rejected: ${rejected}`;
+    }
+
+    if (!deposits.length) {
+        box.innerHTML = "No deposits found.";
+        return;
+    }
+
+    box.innerHTML = deposits.map(d => {
+        let actions = "";
+
+        if (d.status === "pending") {
+            actions = `
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                    <button onclick="approveAdminDeposit(${d.id})">
+                        ✅ Approve
+                    </button>
+                    <button onclick="rejectAdminDeposit(${d.id})">
+                        ❌ Reject
+                    </button>
+                </div>
+            `;
+        }
+
+        return `
+            <div style="
+                border:1px solid #ccc;
+                border-radius:10px;
+                padding:12px;
+                margin:10px 0;
+            ">
+                <b>Deposit #${d.id}</b><br>
+                👤 User: ${escapeHtml(String(d.username || ""))}<br>
+                📦 Package: ${escapeHtml(String(d.package_name || ""))}<br>
+                💰 Amount: ${d.amount} ${escapeHtml(String(d.currency || "PKR"))}<br>
+                🎁 Points: ${d.points}<br>
+                💳 Method: ${escapeHtml(String(d.payment_method || ""))}<br>
+                🧾 Reference: ${escapeHtml(String(d.payment_reference || ""))}<br>
+                📅 Created: ${escapeHtml(String(d.created_at || ""))}<br>
+                📌 Status: <b>${escapeHtml(String(d.status || ""))}</b>
+                ${d.admin_note ? `<br>📝 Note: ${escapeHtml(String(d.admin_note))}` : ""}
+                ${actions}
+            </div>
+        `;
+    }).join("");
+}
+
+async function approveAdminDeposit(id) {
+    if (!confirm("Approve this deposit and credit points?")) return;
+
+    try {
+        const res = await fetch(API + "/admin/deposits/" + id + "/approve", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+            alert("❌ " + (data.error || "Approve failed"));
+            return;
+        }
+
+        alert(
+            "✅ Deposit approved!\n" +
+            "Credited points: " + data.credited_points
+        );
+
+        await loadAdminDeposits();
+
+    } catch (e) {
+        console.error(e);
+        alert("❌ Network error");
+    }
+}
+
+async function rejectAdminDeposit(id) {
+    if (!confirm("Reject this deposit?")) return;
+
+    try {
+        const res = await fetch(API + "/admin/deposits/" + id + "/reject", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN
+            }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+            alert("❌ " + (data.error || "Reject failed"));
+            return;
+        }
+
+        alert("❌ Deposit rejected.");
+
+        await loadAdminDeposits();
+
+    } catch (e) {
+        console.error(e);
+        alert("❌ Network error");
+    }
+}
+
+function escapeHtml(value) {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+async function loadPackages() {
+    const box=document.getElementById("depositPackages");
+    if(!box)return;
+    try{
+        const r=await fetch(API+"/packages",{
+            headers:{
+                "Authorization":"Bearer "+TOKEN
+            }
+        });
+        const d=await r.json();
+        if(!r.ok||!d.ok){box.innerHTML="❌ Failed to load packages";return;}
+        box.innerHTML=d.packages.map(pkg=>`
+            <div style="border:1px solid #ccc;border-radius:10px;padding:12px;margin:10px 0;">
+                <h3>${escapeHtml(String(pkg.name))}</h3>
+                <div>💰 Price: ${pkg.price} ${escapeHtml(String(pkg.currency||"PKR"))}</div>
+                <div>🎁 Points: ${pkg.points}</div>
+                <select id="depositMethod_${pkg.id}" style="margin-top:8px;">
+                    <option value="Easypaisa">Easypaisa</option>
+                    <option value="JazzCash">JazzCash</option>
+                    <option value="USDT (TRC20)">USDT (TRC20)</option>
+                </select>
+                <input id="depositRef_${pkg.id}" type="text" placeholder="Payment reference / transaction ID" style="margin-top:8px;">
+                <button onclick="submitDeposit(${pkg.id})" style="margin-top:8px;">💳 Submit Deposit</button>
+            </div>
+        `).join("");
+    }catch(e){
+        console.error(e);
+        box.innerHTML="❌ Network error";
+    }
+}
+
+async function submitDeposit(packageId) {
+    const method=document.getElementById("depositMethod_"+packageId).value;
+    const reference=document.getElementById("depositRef_"+packageId).value.trim();
+    const message=document.getElementById("depositMessage");
+
+    if(!reference){
+        message.innerText="❌ Payment reference required";
+        return;
+    }
+
+    message.innerText="⏳ Submitting deposit...";
+
+    try{
+        const response=await fetch(API+"/deposits",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+TOKEN
+            },
+            body:JSON.stringify({
+                package_id:packageId,
+                payment_method:method,
+                payment_reference:reference
+            })
+        });
+
+        const data=await response.json();
+
+        if(!response.ok||!data.ok){
+            message.innerText="❌ "+(data.error||"Deposit failed");
+            return;
+        }
+
+        message.innerText="✅ Deposit request submitted. Status: "+data.status;
+        document.getElementById("depositRef_"+packageId).value="";
+    }catch(e){
+        console.error(e);
+        message.innerText="❌ Network error";
+    }
+}
+
+async function loadAdminWithdrawals() {
+    const panel = document.getElementById("adminPanel");
+    const container = document.getElementById("adminWithdrawals");
+
+    if (!panel || !container) return;
+
+    try {
+        const response = await fetch(API + "/admin/withdrawals", {
+            headers: {"Authorization": "Bearer " + TOKEN}
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            panel.style.display = "none";
+            return;
+        }
+
+        try {
+            const statsResponse = await fetch(API + "/admin/stats", {
+                headers: {"Authorization": "Bearer " + TOKEN}
+            });
+
+            const statsData = await statsResponse.json();
+
+            if (statsData.ok) {
+                const stats = document.getElementById("adminStats");
+
+                if (stats) {
+                    stats.innerText =
+                        "👥 Users: " + statsData.total_users +
+                        " | 🕐 Pending: " + statsData.pending_amount +
+                        " pts" +
+                        " | ✅ Approved: " + statsData.approved_amount +
+                        " pts" +
+                        " | ❌ Rejected: " + statsData.rejected_amount +
+                        " pts";
+                }
+            }
+        } catch (e) {}
+
+
+
+        panel.style.display = "block";
+
+        ADMIN_WITHDRAWAL_DATA = data.withdrawals;
+        renderAdminWithdrawals();
+        loadAdminStats();
+        return;
+
+        if (!data.withdrawals.length) {
+            container.innerHTML = "No withdrawal requests yet.";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        data.withdrawals.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "task";
+
+            let actions = "";
+
+            if (item.status === "pending") {
+                actions = `
+                    <button onclick="approveWithdrawal(${item.id})">
+                        ✅ Approve
+                    </button>
+                    <button onclick="rejectWithdrawal(${item.id})">
+                        ❌ Reject
+                    </button>
+                `;
+            }
+
+            div.innerHTML = `
+                <div class="task-title">💰 ${item.amount} points — #${item.id}</div>
+                <div class="task-description">👤 User: ${item.username}</div>
+                <div class="task-description">💳 ${item.account_type}</div>
+                <div class="task-description">📱 ${item.account_number}</div>
+                <div class="reward">🕐 Status: ${item.status}</div>
+                <div class="task-description">📅 ${item.created_at}</div>
+                ${item.admin_note ? `<div class="task-description">📝 Note: ${item.admin_note}</div>` : ""}
+                ${actions}
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+        panel.style.display = "none";
+    }
+}
+
+async function approveWithdrawal(id) {
+    if (!confirm("Approve this withdrawal?")) return;
+
+    try {
+        const response = await fetch(API + "/admin/withdrawals/" + id + "/approve", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN,
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            alert("❌ " + data.error);
+            return;
+        }
+
+        alert("✅ Withdrawal approved!");
+        loadAdminWithdrawals();
+            loadAdminTasks();
+        loadWithdrawals();
+    } catch (error) {
+        alert("❌ Server connection error");
+    }
+}
+
+async function rejectWithdrawal(id) {
+    const note = prompt("Enter rejection reason:");
+
+    if (note === null) return;
+
+    try {
+        const response = await fetch(API + "/admin/withdrawals/" + id + "/reject", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                admin_note: note
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            alert("❌ " + data.error);
+            return;
+        }
+
+        alert("✅ Withdrawal rejected and points refunded!");
+        loadAdminWithdrawals();
+            loadAdminTasks();
+        loadWithdrawals();
+        loadProfile();
+    } catch (error) {
+        alert("❌ Server connection error");
+    }
+}
+
+async function loadWithdrawals() {
+
+    const container =
+        document.getElementById("withdrawHistory");
+
+    if (!container) return;
+
+    container.innerHTML =
+        "⏳ Loading withdrawal history...";
+
+    try {
+
+        const response = await fetch(
+            API + "/withdrawals",
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            container.innerHTML =
+                "❌ " + data.error;
+            return;
+        }
+
+        if (!data.withdrawals.length) {
+            container.innerHTML =
+                "No withdrawal requests yet.";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        data.withdrawals.forEach(item => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "task";
+
+            div.innerHTML = `
+                <div class="task-title">
+                    💰 ${item.amount} points
+                </div>
+
+                <div class="task-description">
+                    💳 ${item.account_type}
+                </div>
+
+                <div class="task-description">
+                    📱 ${item.account_number}
+                </div>
+
+                <div class="reward">
+                    🕐 Status: ${item.status}
+                </div>
+
+                <div class="task-description">
+                    📅 ${item.created_at}
+                </div>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+
+        container.innerHTML =
+            "❌ Server connection error";
+    }
+}
+
+
+// =========================
+// LOAD TASKS
+// =========================
+
+async function loadTransactions() {
+    const container = document.getElementById("transactionHistory");
+
+    if (!container) return;
+
+    container.innerHTML = "⏳ Loading transaction history...";
+
+    try {
+        const response = await fetch(API + "/transactions", {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("watchEarnToken")
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            container.innerHTML = "❌ " + (data.error || "Failed to load transaction history");
+            return;
+        }
+
+        if (!data.transactions.length) {
+            container.innerHTML = "No transactions yet.";
+            return;
+        }
+
+        container.innerHTML = data.transactions.map(item => {
+
+            let label = item.transaction_type;
+
+            if (item.transaction_type === "task_reward") {
+                label = "🎁 Task Reward";
+            } else if (item.transaction_type === "admin_add") {
+                label = "➕ Admin Added";
+            } else if (item.transaction_type === "admin_remove") {
+                label = "➖ Admin Removed";
+            } else if (item.transaction_type === "withdrawal") {
+                label = "💸 Withdrawal";
+            } else if (item.transaction_type === "withdrawal_refund") {
+                label = "🔄 Withdrawal Refund";
+            }
+
+            const sign = item.amount > 0 ? "+" : "";
+
+            return `
+                <div class="card" style="margin:10px 0;">
+                    <strong>${escapeHtml(label)}</strong>
+                    <div>${escapeHtml(item.description || "")}</div>
+                    <div>
+                        Points:
+                        <strong>${item.old_points} → ${item.new_points}</strong>
+                        (${sign}${item.amount})
+                    </div>
+                    <div class="subtitle">
+                        ${escapeHtml(item.created_at || "")}
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        console.error("Transaction history error:", error);
+        container.innerHTML = "❌ Failed to load transaction history";
+    }
+}
+
+async function loadTasks() {
+
+    const container =
+        document.getElementById(
+            "tasks"
+        );
+
+    container.innerHTML =
+        "Loading tasks...";
+
+    try {
+
+        const response = await fetch(
+            API + "/tasks",
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+
+            container.innerHTML =
+                "❌ " + data.error;
+
+            return;
+        }
+
+        container.innerHTML = "";
+
+        data.tasks.forEach(task => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className = "task";
+
+            div.innerHTML = `
+                <div class="task-title">
+                    ${task.title}
+                </div>
+
+                <div class="task-description">
+                    ${task.description}
+                </div>
+
+                <div class="reward">
+                    🪙 Reward:
+                    ${task.reward_points} points
+                </div>
+
+<button
+    onclick="watchVideo(${task.id})">
+    🎬 Watch Video
+</button>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+
+        container.innerHTML =
+            "❌ Server connection error";
+    }
+}
+
+
+// =========================
+// COMPLETE TASK
+// =========================
+function watchVideo(taskId) {
+    window.location.href = "/watch-video?task_id=" + taskId;
+}
+async function completeTask(
+    taskId,
+    button
+) {
+
+    button.disabled = true;
+
+    button.innerText =
+        "Processing...";
+
+    try {
+
+        const response = await fetch(
+            API +
+            "/tasks/" +
+            taskId +
+            "/complete",
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+        if (!data.ok) {
+
+            alert("❌ " + data.error);
+
+            button.disabled = false;
+
+            button.innerText =
+                "Complete Task";
+
+            return;
+        }
+
+        document.getElementById(
+            "balance"
+        ).innerText =
+            data.points;
+
+        button.innerText =
+            "✅ Completed";
+
+    } catch (error) {
+
+        alert(
+            "❌ Server connection error"
+        );
+
+        button.disabled = false;
+
+        button.innerText =
+            "Complete Task";
+    }
+}
+
+
+// =========================
+// LOGOUT
+// =========================
+
+async function logout() {
+
+    if (TOKEN) {
+
+        try {
+
+            await fetch(
+                API + "/logout",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + TOKEN
+                    }
+                }
+            );
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    }
+
+    TOKEN = null;
+
+    localStorage.removeItem(
+        "watchEarnToken"
+    );
+
+    showLogin();
+}
+
+
+// =========================
+// AUTO LOGIN
+// =========================
+
+if (TOKEN) {
+
+    showHome();
+
+    loadProfile();
+    loadTasks();
+    loadWithdrawals();
+    loadTransactions();
+
+} else {
+
+    showLogin();
+}
+
+</script>
+
+</body>
+</html>
+
+<script>
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// ADMIN POINT HISTORY
+
+async function loadPointHistory(search = "") {
+    const panel = document.getElementById("adminPointHistoryPanel");
+    const container = document.getElementById("adminPointHistoryList");
+
+    if (!panel || !container) return;
+
+    panel.style.display = "block";
+    container.innerHTML = "⏳ Loading point history...";
+
+    try {
+        const query = search
+            ? "?search=" + encodeURIComponent(search)
+            : "";
+
+        const response = await fetch(
+            API + "/admin/point-history" + query,
+            {
+                headers: {
+                    "Authorization": "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.error || "Failed to load point history");
+        }
+
+        if (!data.history || data.history.length === 0) {
+            container.innerHTML = "📭 No point history found.";
+            return;
+        }
+
+        container.innerHTML = data.history.map(log => {
+            const change = Number(log.amount);
+            const changeText = change > 0
+                ? `➕ ${change}`
+                : `➖ ${Math.abs(change)}`;
+
+            const reason = log.reason
+                ? `<div>📝 Reason: ${escapeHtml(log.reason)}</div>`
+                : "";
+
+            return `
+                <div class="card" style="margin:8px 0;">
+                    <div><strong>👤 ${escapeHtml(log.target_username)}</strong></div>
+                    <div>🆔 User ID: ${log.target_user_id}</div>
+                    <div>📊 Points: ${log.old_points} → <strong>${log.new_points}</strong></div>
+                    <div>💰 Change: <strong>${changeText}</strong></div>
+                    <div>👨‍💼 Admin: ${escapeHtml(log.admin_username)}</div>
+                    ${reason}
+                    <div>🕐 ${escapeHtml(log.created_at)}</div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        container.innerHTML = "";
+        const msg = document.getElementById("adminPointHistoryMessage");
+
+        if (msg) {
+            msg.textContent = "❌ " + error.message;
+        }
+    }
+}
+
+function searchPointHistory() {
+    const input = document.getElementById("adminPointHistorySearch");
+    const search = input ? input.value.trim() : "";
+
+    loadPointHistory(search);
+}
+
+// ADMIN TASK MANAGEMENT
+
+async function loadAdminUsers(search = "") {
+
+    const panel = document.getElementById("adminUserPanel");
+    const container = document.getElementById("adminUserList");
+
+    if (!panel || !container) return;
+
+    panel.style.display = "block";
+    container.innerHTML = "⏳ Loading users...";
+
+    try {
+
+        const query = search
+            ? "?search=" + encodeURIComponent(search)
+            : "";
+
+        const response = await fetch(
+            API + "/admin/users" + query,
+            {
+                headers: {
+                    "Authorization": "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            container.innerHTML =
+                "❌ " + (data.error || "Could not load users");
+            return;
+        }
+
+        if (!data.users.length) {
+            container.innerHTML = "No users found.";
+            return;
+        }
+
+        container.innerHTML = data.users.map(user => {
+
+            const status = user.is_banned
+                ? "🚫 Banned"
+                : "🟢 Active";
+
+            const adminLabel = user.is_admin
+                ? " 👑 Admin"
+                : "";
+
+            return `
+                <div class="task-card" style="margin-bottom:10px;">
+
+                    <strong>
+                        👤 ${user.username}${adminLabel}
+                    </strong>
+
+                    <div class="task-description">
+                        ID: ${user.id}<br>
+                        💰 Points: ${user.points}<br>
+                        Status: ${status}
+                    </div>
+
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+
+                        <button onclick="adminAddPoints(${user.id}, '${user.username.replace(/'/g, "\\'")}')">
+                            ➕ Add
+                        </button>
+
+                        <button onclick="adminRemovePoints(${user.id}, '${user.username.replace(/'/g, "\\'")}')">
+                            ➖ Remove
+                        </button>
+
+                        ${
+                            user.is_banned
+                            ? `<button onclick="adminUnbanUser(${user.id})">✅ Unban</button>`
+                            : `<button onclick="adminBanUser(${user.id})">🚫 Ban</button>`
+                        }
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML =
+            "❌ Network error while loading users";
+    }
+}
+
+
+function searchAdminUsers() {
+
+    const input = document.getElementById("adminUserSearch");
+
+    const search = input
+        ? input.value.trim()
+        : "";
+
+    loadAdminUsers(search);
+}
+
+
+async function adminChangePoints(userId, username, amount) {
+
+    if (!Number.isInteger(amount) || amount === 0) {
+        return;
+    }
+
+    const action = amount > 0
+        ? "add"
+        : "remove";
+
+    const absoluteAmount = Math.abs(amount);
+
+    const confirmed = confirm(
+        `${action === "add" ? "Add" : "Remove"} ${absoluteAmount} points ${action === "add" ? "to" : "from"} ${username}?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            API + "/admin/users/" + userId + "/points",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + TOKEN
+                },
+
+                body: JSON.stringify({
+                    amount: amount
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+
+            alert(
+                "❌ " + (data.error || "Points update failed")
+            );
+
+            return;
+        }
+
+        alert(
+            `✅ ${data.message}\n\n${username}: ${data.user.points} points`
+        );
+
+        const searchInput =
+            document.getElementById("adminUserSearch");
+
+        loadAdminUsers(
+            searchInput
+                ? searchInput.value.trim()
+                : ""
+        );
+
+        if (typeof loadProfile === "function") {
+            loadProfile();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Network error");
+    }
+}
+
+
+function adminAddPoints(userId, username) {
+
+    const value = prompt(
+        `How many points do you want to ADD to ${username}?`
+    );
+
+    if (value === null) {
+        return;
+    }
+
+    const amount = Number(value);
+
+    if (!Number.isInteger(amount) || amount <= 0) {
+        alert("❌ Enter a positive whole number.");
+        return;
+    }
+
+    adminChangePoints(
+        userId,
+        username,
+        amount
+    );
+}
+
+
+function adminRemovePoints(userId, username) {
+
+    const value = prompt(
+        `How many points do you want to REMOVE from ${username}?`
+    );
+
+    if (value === null) {
+        return;
+    }
+
+    const amount = Number(value);
+
+    if (!Number.isInteger(amount) || amount <= 0) {
+        alert("❌ Enter a positive whole number.");
+        return;
+    }
+
+    adminChangePoints(
+        userId,
+        username,
+        -amount
+    );
+}
+
+
+async function adminSetUserBan(userId, banned) {
+
+    try {
+
+        const response = await fetch(
+            API + "/admin/users/" + userId + "/ban",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + TOKEN
+                },
+
+                body: JSON.stringify({
+                    banned: banned
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+
+            alert(
+                "❌ " + (data.error || "Ban status update failed")
+            );
+
+            return;
+        }
+
+        alert("✅ " + data.message);
+
+        const searchInput =
+            document.getElementById("adminUserSearch");
+
+        loadAdminUsers(
+            searchInput
+                ? searchInput.value.trim()
+                : ""
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("❌ Network error");
+    }
+}
+
+
+function adminBanUser(userId) {
+
+    if (!confirm("🚫 Ban this user?\n\nThe user's active sessions will also be removed.")) {
+        return;
+    }
+
+    adminSetUserBan(
+        userId,
+        true
+    );
+}
+
+
+function adminUnbanUser(userId) {
+
+    if (!confirm("✅ Unban this user?")) {
+        return;
+    }
+
+    adminSetUserBan(
+        userId,
+        false
+    );
+}
+
+
+async function loadAdminTasks() {
+    const panel = document.getElementById("adminTaskPanel");
+    const container = document.getElementById("adminTaskList");
+
+    if (!panel || !container) return;
+
+    try {
+        const response = await fetch(API + "/admin/tasks", {
+            headers: {
+                "Authorization": "Bearer " + TOKEN
+            }
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) return;
+
+        panel.style.display = "block";
+        container.innerHTML = "";
+
+        if (!data.tasks || !data.tasks.length) {
+            container.innerHTML = "No tasks found.";
+            return;
+        }
+
+        data.tasks.forEach(task => {
+            const div = document.createElement("div");
+            div.className = "task";
+
+            div.innerHTML = `
+                <div class="task-title">🎯 ${task.title}</div>
+                <div class="task-description">${task.description || ""}</div>
+                <div class="reward">🎁 Reward: ${task.reward_points} points</div>
+                <div class="task-description">
+                    ${task.active ? "🟢 Active" : "🔴 Disabled"}
+                </div>
+                <button onclick="adminEditTask(${task.id}, '${task.title.replace("'", "\\'")}', '${(task.description || "").replace("'", "\\'")}', ${task.reward_points})">
+                    ✏️ Edit
+                </button>
+
+                <button onclick="adminToggleTask(${task.id})">
+                    ${task.active ? "🔴 Disable" : "🟢 Enable"}
+                </button>
+                <button onclick="adminDeleteTask(${task.id}, '${task.title.replace("'", "\\'")}')">
+                    🗑️ Delete
+                </button>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (error) {
+        container.innerText = "❌ Failed to load tasks";
+    }
+}
+
+
+
+async function adminDeleteTask(taskId, title) {
+
+    const confirmed = confirm(
+        "⚠️ Delete this task permanently?\n\n" +
+        "Task: " + title +
+        "\n\nThis action cannot be undone."
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            API + "/admin/tasks/" + taskId,
+            {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            alert("❌ " + (data.error || "Failed to delete task"));
+            return;
+        }
+
+        alert("✅ Task deleted successfully.");
+
+        await loadAdminTasks();
+        await loadTasks();
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Server connection error.");
+    }
+}
+
+function adminEditTask(taskId, title, description, reward) {
+    document.getElementById("editTaskId").value = taskId;
+    document.getElementById("editTaskTitle").value = title;
+    document.getElementById("editTaskDescription").value = description;
+    document.getElementById("editTaskReward").value = reward;
+    document.getElementById("adminEditTaskBox").style.display = "block";
+}
+
+function cancelEditTask() {
+    document.getElementById("adminEditTaskBox").style.display = "none";
+}
+
+async function saveEditedTask() {
+    const taskId = document.getElementById("editTaskId").value;
+    const title = document.getElementById("editTaskTitle").value.trim();
+    const description = document.getElementById("editTaskDescription").value.trim();
+    const reward = Number(document.getElementById("editTaskReward").value);
+    const message = document.getElementById("adminTaskMessage");
+
+    if (!title) {
+        message.innerText = "❌ Task title is required.";
+        return;
+    }
+
+    if (!reward || reward <= 0) {
+        message.innerText = "❌ Reward points must be greater than 0.";
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            API + "/admin/tasks/" + taskId,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + TOKEN
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    reward_points: reward
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            message.innerText = "❌ " + (data.error || "Update failed");
+            return;
+        }
+
+        message.innerText = "✅ Task updated successfully.";
+        document.getElementById("adminEditTaskBox").style.display = "none";
+
+        await loadAdminTasks();
+        await loadTasks();
+
+    } catch (error) {
+        console.error(error);
+        message.innerText = "❌ Server connection error.";
+    }
+}
+
+async function adminToggleTask(taskId) {
+    try {
+        const response = await fetch(
+            API + "/admin/tasks/" + taskId + "/toggle",
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + TOKEN
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            alert("❌ " + (data.error || "Failed"));
+            return;
+        }
+
+        loadAdminTasks();
+        loadTasks();
+
+    } catch (error) {
+        alert("❌ Server connection error");
+    }
+}
+
+async function adminAddTask() {
+    const title = document.getElementById("adminTaskTitle").value.trim();
+    const description = document.getElementById("adminTaskDescription").value.trim();
+    const reward = Number(document.getElementById("adminTaskReward").value);
+    const message = document.getElementById("adminTaskMessage");
+
+    if (!title) {
+        message.innerText = "❌ Task title is required";
+        return;
+    }
+
+    if (!reward || reward <= 0) {
+        message.innerText = "❌ Reward must be greater than 0";
+        return;
+    }
+
+    try {
+        const response = await fetch(API + "/admin/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + TOKEN
+            },
+            body: JSON.stringify({
+                title: title,
+                description: description,
+                reward_points: reward
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            message.innerText = "❌ " + (data.error || "Failed");
+            return;
+        }
+
+        message.innerText = "✅ Task created successfully";
+
+        document.getElementById("adminTaskTitle").value = "";
+        document.getElementById("adminTaskDescription").value = "";
+        document.getElementById("adminTaskReward").value = "";
+
+        loadAdminTasks();
+
+    } catch (error) {
+        message.innerText = "❌ Server connection error";
+    }
+}
+</script>
